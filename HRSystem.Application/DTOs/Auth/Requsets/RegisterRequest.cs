@@ -1,7 +1,4 @@
 ﻿using HRSystem.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Application.DTOs.Auth.Requsets
 {

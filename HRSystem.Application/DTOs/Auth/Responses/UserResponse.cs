@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HRSystem.Application.DTOs.Auth.Responses
+﻿namespace HRSystem.Application.DTOs.Auth.Responses
 {
     public class UserResponse
     {

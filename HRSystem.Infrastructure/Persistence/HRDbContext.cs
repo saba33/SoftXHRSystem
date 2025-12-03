@@ -1,9 +1,6 @@
 ﻿using HRSystem.Domain.Entities;
 using HRSystem.Domain.Entities.UserEntity;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Infrastructure.Persistence
 {

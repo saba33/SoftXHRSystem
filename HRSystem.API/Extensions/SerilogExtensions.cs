@@ -25,7 +25,7 @@ namespace HRSystem.API.Extensions
                 .WriteTo.Async(a => a.File(
                     path: "logs/error-.json",
                     rollingInterval: RollingInterval.Day,
-                    formatter: new JsonFormatter() 
+                    formatter: new JsonFormatter()
                 ))
 
                 .CreateLogger();

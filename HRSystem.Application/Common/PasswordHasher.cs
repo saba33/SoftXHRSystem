@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace HRSystem.Application.Common
@@ -14,7 +12,7 @@ namespace HRSystem.Application.Common
 
             using var hmac = new HMACSHA512();
 
-   
+
             passwordSalt = Convert.ToBase64String(hmac.Key);
 
 

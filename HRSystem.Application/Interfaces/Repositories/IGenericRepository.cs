@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Text;
+﻿using System.Linq.Expressions;
 
 namespace HRSystem.Application.Interfaces.Repositories
 {
@@ -14,5 +11,6 @@ namespace HRSystem.Application.Interfaces.Repositories
         Task DeleteAsync(T entity);
         Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
         IQueryable<T> Query();
+        Task UpdateRangeAsync(IEnumerable<T> entities);
     }
 }

@@ -1,7 +1,4 @@
 ﻿using HRSystem.Domain.Entities.UserEntity;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Application.Interfaces.Repositories
 {

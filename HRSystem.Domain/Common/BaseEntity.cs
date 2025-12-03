@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HRSystem.Domain.Common
+﻿namespace HRSystem.Domain.Common
 {
     public class BaseEntity
     {

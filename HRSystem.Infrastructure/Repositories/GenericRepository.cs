@@ -1,10 +1,7 @@
 ﻿using HRSystem.Application.Interfaces.Repositories;
 using HRSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace HRSystem.Infrastructure.Repositories
 {
@@ -49,5 +46,10 @@ namespace HRSystem.Infrastructure.Repositories
 
         public IQueryable<T> Query()
             => _dbSet.AsQueryable();
+        public async Task UpdateRangeAsync(IEnumerable<T> entities)
+        {
+            _dbSet.UpdateRange(entities);
+            await _context.SaveChangesAsync();
+        }
     }
 }

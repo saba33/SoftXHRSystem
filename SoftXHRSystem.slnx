@@ -3,4 +3,7 @@
   <Project Path="HRSystem.Application/HRSystem.Application.csproj" />
   <Project Path="HRSystem.Domain/HRSystem.Domain.csproj" />
   <Project Path="HRSystem.Infrastructure/HRSystem.Infrastructure.csproj" />
+  <Project Path="HRSystem.MVC/HRSystem.MVC.csproj" Id="055660c6-acb5-46b4-91e2-d31742bbdcc0" />
+  <Project Path="HRSystem.Tests/HRSystem.Tests.csproj" Id="9f910c6a-a356-4d51-887b-67f57021c443" />
+  <Project Path="HRSystem.Worker/HRSystem.Worker.csproj" Id="ea424e5c-e38e-48d8-8a9a-6a957efda091" />
 </Solution>

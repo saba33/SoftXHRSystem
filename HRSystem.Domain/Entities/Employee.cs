@@ -1,9 +1,6 @@
 ﻿using HRSystem.Domain.Common;
 using HRSystem.Domain.Entities.UserEntity;
 using HRSystem.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Domain.Entities
 {

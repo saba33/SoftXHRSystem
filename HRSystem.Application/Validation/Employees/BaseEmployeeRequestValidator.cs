@@ -1,10 +1,6 @@
 ﻿using FluentValidation;
 using HRSystem.Application.DTOs.Employees.Requests;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HRSystem.Domain.Enums;
 
 namespace HRSystem.Application.Validation.Employees
 {
@@ -27,9 +23,8 @@ namespace HRSystem.Application.Validation.Employees
                 .MaximumLength(50);
 
             RuleFor(x => x.Gender)
-                .NotEmpty().WithMessage("Gender is required")
-                .Must(v => v == "M" || v == "F")
-                .WithMessage("Gender must be 'M' or 'F'");
+                .IsInEnum().WithMessage("Invalid Gender value")
+                .NotEmpty().WithMessage("Gender is required");
 
             RuleFor(x => x.BirthDate)
                 .NotEmpty()
@@ -41,17 +36,18 @@ namespace HRSystem.Application.Validation.Employees
                 .WithMessage("PositionId is required");
 
             RuleFor(x => x.Status)
+                .IsInEnum().WithMessage("Invalid Status value")
                 .NotEmpty().WithMessage("Status is required");
 
             RuleFor(x => x.FiredDate)
                 .Must((req, firedDate) =>
                 {
-                    if (req.Status == "Fired" && firedDate == null)
+                    if (req.Status == EmployeeStatus.Terminated && firedDate == null)
                         return false;
 
                     return true;
                 })
-                .WithMessage("FiredDate is required when Status = Fired");
+                .WithMessage("FiredDate is required when Status = Terminated");
         }
     }
 }

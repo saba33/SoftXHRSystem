@@ -2,9 +2,6 @@
 using HRSystem.Domain.Entities;
 using HRSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Infrastructure.Repositories
 {
@@ -28,15 +25,17 @@ namespace HRSystem.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.Id == id);
         }
 
-        public async Task<bool> ExistsByPersonalNumberAsync(string personalNumber)
-        {
-            return await AnyAsync(x => x.PersonalNumber == personalNumber);
-        }
+
         public async Task<List<Employee>> GetAllWithPositionAsync()
         {
             return await _dbSet
                 .Include(x => x.Position)
                 .ToListAsync();
+        }
+
+        public async Task<bool> ExistsByPersonalNumberAsync(string personalNumber)
+        {
+            return await AnyAsync(x => x.PersonalNumber == personalNumber);
         }
 
         public async Task<List<Employee>> SearchAsync(string keyword)

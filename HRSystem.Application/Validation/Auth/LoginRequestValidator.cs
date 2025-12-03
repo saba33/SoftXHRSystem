@@ -1,9 +1,5 @@
 ﻿using FluentValidation;
-using FluentValidation.AspNetCore;
 using HRSystem.Application.DTOs.Auth.Requsets;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Application.Validation.Auth
 {

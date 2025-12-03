@@ -1,0 +1,95 @@
+﻿@model HRSystem.Application.DTOs.Auth.Requsets.RegisterRequest
+@using HRSystem.Domain.Enums
+
+@{
+    ViewData["Title"] = "რეგისტრაცია";
+    Layout = "_Layout";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 90vh;">
+    <div class="card shadow-lg p-4" style="width: 520px; border-radius: 14px;">
+
+        <h3 class="text-center mb-4">რეგისტრაცია</h3>
+
+        <form asp-action="Register" method="post">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="mb-3">
+                <label asp-for="PersonalNumber" class="form-label">პირადი ნომერი (11 ციფრი)</label>
+                <input asp-for="PersonalNumber" class="form-control form-control-lg" />
+                <span asp-validation-for="PersonalNumber" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FirstName" class="form-label">სახელი</label>
+                <input asp-for="FirstName" class="form-control form-control-lg" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="LastName" class="form-label">გვარი</label>
+                <input asp-for="LastName" class="form-control form-control-lg" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Gender" class="form-label">სქესი</label>
+                <select asp-for="Gender" class="form-control form-control-lg"
+                        asp-items="Html.GetEnumSelectList<Gender>()">
+                    <option value="">აირჩიეთ სქესი</option>
+                </select>
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="BirthDate" class="form-label">დაბადების თარიღი</label>
+                <input asp-for="BirthDate" type="date" class="form-control form-control-lg" />
+                <span asp-validation-for="BirthDate" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label">მომხმარებლის სახელი (Username)</label>
+                <input asp-for="Username" class="form-control form-control-lg" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">ელ.ფოსტა</label>
+                <input asp-for="Email" class="form-control form-control-lg" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">პაროლი</label>
+                <input asp-for="Password" type="password" class="form-control form-control-lg" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label">გაიმეორეთ პაროლი</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control form-control-lg" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-lg w-100 mt-2">
+                რეგისტრაცია
+            </button>
+
+            <div class="text-center mt-3">
+                <small>
+                    უკვე გაქვთ ანგარიში?
+                    <a asp-action="Login">შესვლა</a>
+                </small>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

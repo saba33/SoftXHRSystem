@@ -1,7 +1,4 @@
 ﻿using HRSystem.Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Application.Interfaces.Repositories
 {
@@ -16,7 +13,6 @@ namespace HRSystem.Application.Interfaces.Repositories
         Task<bool> ExistsByPersonalNumberAsync(string personalNumber);
 
         Task<List<Employee>> GetAllWithPositionAsync();
-
         Task<List<Employee>> SearchEmployeesAsync(
             string? personalNumber,
             int? positionId);

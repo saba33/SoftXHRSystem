@@ -2,9 +2,6 @@
 using HRSystem.Domain.Entities.UserEntity;
 using HRSystem.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace HRSystem.Infrastructure.Repositories
 {

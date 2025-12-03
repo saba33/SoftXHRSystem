@@ -1,0 +1,202 @@
+﻿@model HRSystem.Application.DTOs.Employees.Requests.EmployeeCreateRequest
+@using HRSystem.Application.DTOs.Position;
+@using HRSystem.Application.DTOs.Auth.Responses
+@using HRSystem.Domain.Enums
+
+@{
+    ViewData["Title"] = "თანამშრომლის დამატება";
+    var positions = ViewBag.Positions as List<PositionResponse>;
+}
+
+<h2 class="mb-4 text-primary">თანამშრომლის დამატება</h2>
+<hr />
+
+<div class="row">
+    <div class="col-md-10">
+        <div class="card shadow-sm p-4">
+            <form asp-action="Create" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6 border-end">
+                        <h5 class="card-title text-secondary mb-3">პირადი ინფორმაცია</h5>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PersonalNumber" class="form-label">პირადი ნომერი</label>
+                            <input asp-for="PersonalNumber" class="form-control" placeholder="მაგ. 01000000000" />
+                            <span asp-validation-for="PersonalNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="FirstName" class="form-label">სახელი</label>
+                            <input asp-for="FirstName" class="form-control" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="LastName" class="form-label">გვარი</label>
+                            <input asp-for="LastName" class="form-control" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Gender" class="form-label">სქესი</label>
+                            <select asp-for="Gender" class="form-select" asp-items="Html.GetEnumSelectList<Gender>()">
+                                <option value="">აირჩიეთ სქესი</option>
+                            </select>
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="BirthDate" class="form-label">დაბადების თარიღი</label>
+                            <input asp-for="BirthDate" type="date" class="form-control" />
+                            <span asp-validation-for="BirthDate" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h5 class="card-title text-secondary mb-3">სამუშაო და პოზიცია</h5>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PositionId" class="form-label">თანამდებობა (აირჩიეთ თანამდებობის ხიდან)</label>
+
+                            <input type="hidden" asp-for="PositionId" id="selectedPositionId" />
+
+                            <div class="card p-3 position-tree-container" style="max-height: 250px; overflow-y: auto; border: 1px solid #ddd;">
+                                @if (positions != null && positions.Any())
+                                {
+                                    await RenderPositionTree(positions, 0);
+                                }
+                                else
+                                {
+                                    <p class="text-warning">პოზიციები ვერ მოიძებნა. API-ს პრობლემა.</p>
+                                }
+                            </div>
+                            <small class="text-muted mt-1">არჩეული: <span id="selectedPositionName" class="fw-bold text-success"></span></small>
+                            <span asp-validation-for="PositionId" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Status" class="form-label">სტატუსი</label>
+                            <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<EmployeeStatus>()">
+                                <option value="">აირჩიეთ სტატუსი</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="FiredDate" class="form-label">გათავისუფლების თარიღი (თუ საჭიროა)</label>
+                            <input asp-for="FiredDate" type="date" class="form-control" />
+                            <span asp-validation-for="FiredDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-5 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="fas fa-plus"></i> დამატება
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> უკან სიაში
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $('.position-tree-container').on('click', '.position-select-btn', function (e) {
+                e.preventDefault();
+
+                $('.position-select-btn').removeClass('active-position');
+                $(this).addClass('active-position');
+
+                var id = $(this).data('id');
+                var name = $(this).data('name');
+
+                $('#selectedPositionId').val(id);
+                $('#selectedPositionName').text(name);
+            });
+
+            var currentPosId = $('#selectedPositionId').val();
+            if (currentPosId) {
+                var $initialBtn = $(`.position-select-btn[data-id='${currentPosId}']`);
+                $initialBtn.addClass('active-position');
+
+                if ($initialBtn.data('name')) {
+                     $('#selectedPositionName').text($initialBtn.data('name'));
+                }
+            }
+        });
+    </script>
+    <style>
+        .position-select-btn {
+            display: block;
+            padding: 5px 8px;
+            text-align: left;
+            border: none;
+            background: none;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #343a40;
+            transition: background-color 0.15s ease-in-out;
+            font-size: 14px;
+        }
+
+            .position-select-btn:hover {
+                background-color: #e9ecef;
+                color: #007bff;
+            }
+
+        .active-position {
+            background-color: #d4edda;
+            color: #155724;
+            font-weight: bold;
+            border: 1px solid #c3e6cb;
+        }
+
+        .position-tree-container .position-select-btn {
+            position: relative;
+        }
+
+            .position-tree-container .position-select-btn:not(.active-position):hover {
+                color: #007bff;
+            }
+    </style>
+}
+
+@functions {
+    public async Task RenderPositionTree(List<PositionResponse> positions, int level)
+    {
+        var padding = level * 20;
+        foreach (var position in positions)
+        {
+            <div style="padding-left: @(padding)px;">
+                <a href="#"
+                   class="position-select-btn"
+                   data-id="@position.Id"
+                   data-name="@position.Name"
+                   title="აირჩიე @position.Name">
+                    @if (level > 0)
+                    {
+                        @Html.Raw("↳ ")
+                    }
+                    <i class="fas fa-briefcase me-1"></i> @position.Name
+                </a>
+            </div>
+
+            @if (position.Children != null && position.Children.Any())
+            {
+                await RenderPositionTree(position.Children, level + 1);
+            }
+        }
+    }
+}

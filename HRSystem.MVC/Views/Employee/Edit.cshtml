@@ -1,0 +1,172 @@
+﻿@model HRSystem.Application.DTOs.Employees.Responses.EmployeeResponse
+@using HRSystem.Domain.Enums
+@using HRSystem.Application.DTOs.Position
+
+@{
+    ViewData["Title"] = "თანამშრომლის რედაქტირება";
+    var positions = ViewBag.Positions as List<HRSystem.Application.DTOs.Position.PositionResponse>;
+}
+
+    <h1>თანამშრომლის რედაქტირება: @Model.FullName</h1>
+    <hr />
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <input type="hidden" name="Id" value="@Model.Id" />
+
+                <div class="form-group mb-3">
+                    <label for="PersonalNumber" class="control-label">პირადი ნომერი</label>
+                    <input name="PersonalNumber" value="@Model.PersonalNumber" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="FirstName" class="control-label">სახელი</label>
+                    <input name="FirstName" value="@Model.FirstName" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="LastName" class="control-label">გვარი</label>
+                    <input name="LastName" value="@Model.LastName" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Gender" class="control-label">სქესი</label>
+                    <select name="Gender" class="form-control" asp-items="Html.GetEnumSelectList<Gender>()">
+                        <option value="@Model.Gender" selected>@Model.Gender</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="BirthDate" class="control-label">დაბადების თარიღი</label>
+                    <input name="BirthDate" type="date" value="@Model.BirthDate.ToString("yyyy-MM-dd")" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="selectedPositionId" class="control-label">თანამდებობა (აირჩიეთ თანამდებობის ხიდან)</label>
+
+                    <input type="hidden" name="PositionId" id="selectedPositionId" value="@Model.PositionId" />
+
+                    <div class="card p-3" style="max-height: 250px; overflow-y: auto; border: 1px solid #ccc;">
+                        @if (positions != null && positions.Any())
+                        {
+                            await RenderPositionTree(positions, 0);
+                        }
+                        else
+                        {
+                            <p class="text-warning">პოზიციები ვერ მოიძებნა. API-ს პრობლემა.</p>
+                        }
+                    </div>
+                    <span class="text-danger"></span>
+                    <small class="text-muted">მიმდინარე პოზიცია: <strong id="currentPositionName">@Model.PositionName</strong></small>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="Status" class="control-label">სტატუსი</label>
+                    <select name="Status" class="form-control" asp-items="Html.GetEnumSelectList<EmployeeStatus>()">
+                        <option value="@Model.Status" selected>@Model.Status</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label for="FiredDate" class="control-label">გათავისუფლების თარიღი (თუ საჭიროა)</label>
+                    @{
+                        string firedDateValue = Model.FiredDate.HasValue ? Model.FiredDate.Value.ToString("yyyy-MM-dd") : string.Empty;
+                    }
+                    <input name="FiredDate" type="date" value="@firedDateValue" class="form-control" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <div class="form-group mt-4">
+                    <input type="submit" value="შენახვა" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">უკან სიაში</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+        <script>
+            $(document).ready(function () {
+                $('.position-select-btn').on('click', function (e) {
+                    e.preventDefault();
+
+                    $('.position-select-btn').removeClass('active-position');
+                    $(this).addClass('active-position');
+
+                    var id = $(this).data('id');
+                    var name = $(this).data('name');
+
+                    $('#selectedPositionId').val(id);
+                    $('#currentPositionName').text(name);
+                });
+
+                var currentPosId = $('#selectedPositionId').val();
+                if (currentPosId) {
+                    $(`.position-select-btn[data-id='${currentPosId}']`).addClass('active-position');
+                }
+            });
+        </script>
+        <style>
+            .position-select-btn {
+                display: block;
+                padding: 3px 5px;
+                text-align: left;
+                border: none;
+                background: none;
+                cursor: pointer;
+                width: 100%;
+                border-radius: 3px;
+                text-decoration: none;
+            }
+
+                .position-select-btn:hover {
+                    background-color: #f0f0f0;
+                }
+
+            .active-position {
+                background-color: #cce5ff;
+                color: #004085;
+                font-weight: bold;
+            }
+        </style>
+}
+
+@functions {
+    public async Task RenderPositionTree(List<HRSystem.Application.DTOs.Position.PositionResponse> positions, int level)
+    {
+        var padding = level * 20;
+        foreach (var position in positions)
+        {
+                <div style="padding-left: @(padding)px;">
+                    <a href="#"
+                       class="position-select-btn"
+                       data-id="@position.Id"
+                       data-name="@position.Name"
+                       title="აირჩიე @position.Name">
+                        @if (level > 0)
+                        {
+                            @Html.Raw("└─ ")
+                        }
+                        @position.Name
+                    </a>
+                </div>
+
+            @if (position.Children.Any())
+            {
+                await RenderPositionTree(position.Children, level + 1);
+            }
+        }
+    }
+}

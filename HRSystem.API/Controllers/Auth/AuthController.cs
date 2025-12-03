@@ -1,6 +1,5 @@
 ﻿using HRSystem.Application.DTOs.Auth.Requsets;
 using HRSystem.Application.Interfaces.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HRSystem.API.Controllers.Auth
