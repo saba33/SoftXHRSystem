@@ -17,7 +17,7 @@ namespace HRSystem.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.0")
+                .HasAnnotation("ProductVersion", "8.0.22")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -44,11 +44,13 @@ namespace HRSystem.Infrastructure.Migrations
 
                     b.Property<string>("Email")
                         .HasMaxLength(150)
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasMaxLength(100)
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("Gender")
@@ -57,12 +59,14 @@ namespace HRSystem.Infrastructure.Migrations
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(100)
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("PersonalNumber")
                         .IsRequired()
                         .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(11)");
 
                     b.Property<int>("PositionId")
                         .HasColumnType("int");
@@ -104,6 +108,7 @@ namespace HRSystem.Infrastructure.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)
+                        .IsUnicode(true)
                         .HasColumnType("nvarchar(150)");
 
                     b.Property<int?>("ParentId")

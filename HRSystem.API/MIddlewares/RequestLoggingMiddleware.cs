@@ -12,23 +12,25 @@ namespace HRSystem.API.MIddlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
-            var stopwatch = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
             var request = context.Request;
-            var path = request.Path;
             var method = request.Method;
+            var path = request.Path + request.QueryString;
             var ip = context.Connection.RemoteIpAddress?.ToString();
 
             await _next(context);
 
-            stopwatch.Stop();
+            sw.Stop();
 
-            Log.Information(
-                "{Method} {Path} completed in {Elapsed}ms from {IP}",
-                method, path, stopwatch.ElapsedMilliseconds, ip
-            );
+            Log.ForContext("Method", method)
+               .ForContext("Path", path)
+               .ForContext("Elapsed", sw.ElapsedMilliseconds)
+               .ForContext("IP", ip)
+               .ForContext("StatusCode", context.Response.StatusCode)
+               .Information("Request completed");
         }
     }
 }

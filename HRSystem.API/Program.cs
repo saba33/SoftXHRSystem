@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
 using HRSystem.API.Extensions;
-using HRSystem.API.Services;
+using HRSystem.Application.Interfaces.Services;
 using HRSystem.Application.Validation.Auth;
 using HRSystem.Infrastructure.Extensions;
 using HRSystem.Infrastructure.Persistence;
+using HRSystem.Worker;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -25,7 +26,8 @@ builder.Services.AddDependencies();
 
 builder.Services.AddQuartzWorker();
 
-builder.Services.AddScoped<EmployeeSchedulerService>();
+
+builder.Services.AddScoped<IEmployeeSchedulerService, EmployeeSchedulerServiceJob>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -48,14 +50,6 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-/*
-builder.Services.AddAuthentication("MyCookieAuth")
-    .AddCookie("MyCookieAuth", options =>
-    {
-        options.Cookie.Name = "HRSystem.Auth";
-        options.LoginPath = "/auth/login";
-    });
-*/
 
 builder.Services.AddValidatorsFromAssembly(typeof(RegisterRequestValidator).Assembly);
 builder.Services.AddFluentValidationAutoValidation();

@@ -7,6 +7,7 @@ using HRSystem.Application.Interfaces.Services;
 using HRSystem.Domain.Entities;
 using HRSystem.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 
 namespace HRSystem.Application.Services
@@ -15,26 +16,47 @@ namespace HRSystem.Application.Services
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<EmployeeService> _logger;
+        private readonly IEmployeeSchedulerService _scheduler;
 
         public EmployeeService(IEmployeeRepository employeeRepository,
-            IMapper mapper)
+            IMapper mapper,
+            ILogger<EmployeeService> logger,
+            IEmployeeSchedulerService scheduler)
         {
             _employeeRepository = employeeRepository;
             _mapper = mapper;
+            _logger = logger;
+            _scheduler = scheduler;
         }
 
-        public async Task<EmployeeResponse> CreateAsync(EmployeeCreateRequest request)
+        public async Task<EmployeeResponse> CreateAsync(EmployeeCreateRequest request, int createdByUserId)
         {
             var employee = _mapper.Map<Employee>(request);
             employee.CreatedAt = DateTime.UtcNow;
+            employee.CreatedByUserId = createdByUserId;
+
             await _employeeRepository.AddAsync(employee);
+
+            _logger.LogInformation("Employee Created: {Id} - {FullNam}",
+                employee.Id, employee.FirstName + " " + employee.LastName);
+
+            await _scheduler.ScheduleActivationAsync(employee.Id);
+            _logger.LogInformation("Activation Job is Scheduled For Employee: {Id} - {FullName}",
+               employee.Id, employee.FirstName + " " + employee.LastName);
+
             return _mapper.Map<EmployeeResponse>(employee);
         }
 
         public async Task DeleteAsync(int id)
         {
             var employee = await _employeeRepository.GetByIdAsync(id);
-            if (employee == null) throw new Exception("თანამშრომელი ვერ მოიძებნა");
+            if (employee == null)
+            {
+                _logger.LogWarning("Delete failed. Employee not found: {Id}", id);
+                throw new Exception("თანამშრომელი ვერ მოიძებნა");
+            }
+
             await _employeeRepository.DeleteAsync(employee);
         }
 
@@ -47,17 +69,30 @@ namespace HRSystem.Application.Services
         public async Task<EmployeeResponse> GetByIdAsync(int id)
         {
             var employee = await _employeeRepository.GetWithPositionAsync(id);
-            if (employee == null) throw new Exception("თანამშრომელი ვერ მოიძებნა");
+            if (employee == null)
+            {
+                _logger.LogWarning("GetById failed. Employee not found: {Id}", id);
+                throw new Exception("თანამშრომელი ვერ მოიძებნა");
+            }
             return _mapper.Map<EmployeeResponse>(employee);
         }
 
-        public async Task<EmployeeResponse> UpdateAsync(int id, EmployeeUpdateRequest request)
+        public async Task<EmployeeResponse> UpdateAsync(int id, EmployeeUpdateRequest request, int updatedByUserId)
         {
             var existing = await _employeeRepository.GetByIdAsync(id);
-            if (existing == null) throw new Exception("თანამშრომელი ვერ მოიძებნა");
+            if (existing == null)
+            {
+                _logger.LogWarning("Update failed. Employee not found: {Id}", id);
+                throw new Exception("თანამშრომელი ვერ მოიძებნა");
+            }
 
             _mapper.Map(request, existing);
+            existing.UpdatedAt = DateTime.UtcNow;
+            existing.UpdatedByUserId = updatedByUserId;
             await _employeeRepository.UpdateAsync(existing);
+
+            _logger.LogInformation("Employee updated: {Id}", id);
+
             return _mapper.Map<EmployeeResponse>(existing);
         }
 
@@ -104,15 +139,21 @@ namespace HRSystem.Application.Services
             return query;
         }
 
-        private IQueryable<Employee> ApplySorting(IQueryable<Employee> query, string sortBy, string sortDirection)
+        public IQueryable<Employee> ApplySorting(IQueryable<Employee> query, string sortBy, string sortDirection)
         {
             var isDescending = sortDirection?.ToLower() == "desc";
 
             return sortBy?.ToLower() switch
             {
-                "lastname" => isDescending ? query.OrderByDescending(e => e.LastName) : query.OrderBy(e => e.LastName),
-                "position" => isDescending ? query.OrderByDescending(e => e.Position.Name) : query.OrderBy(e => e.Position.Name),
-                _ => isDescending ? query.OrderByDescending(e => e.FirstName) : query.OrderBy(e => e.FirstName),
+                "position" => isDescending
+                    ? query.OrderByDescending(e => e.Position.Name)
+                    : query.OrderBy(e => e.Position.Name),
+
+                "personalnumber" => isDescending
+                    ? query.OrderByDescending(e => e.PersonalNumber)
+                    : query.OrderBy(e => e.PersonalNumber),
+
+                _ => query.OrderBy(e => e.Id)
             };
         }
         public async Task<int> ActivatePendingEmployeesAsync()

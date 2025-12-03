@@ -1,4 +1,4 @@
-﻿using HRSystem.API.Services;
+﻿using HRSystem.Application.Interfaces.Services;
 using HRSystem.Worker;
 using Moq;
 using Quartz;
@@ -7,7 +7,7 @@ public class EmployeeSchedulerServiceTests
 {
     private readonly Mock<ISchedulerFactory> _schedulerFactoryMock;
     private readonly Mock<IScheduler> _schedulerMock;
-    private readonly EmployeeSchedulerService _service;
+    private readonly IEmployeeSchedulerService _service;
 
     public EmployeeSchedulerServiceTests()
     {
@@ -18,7 +18,7 @@ public class EmployeeSchedulerServiceTests
             .Setup(f => f.GetScheduler(It.IsAny<CancellationToken>()))
             .ReturnsAsync(_schedulerMock.Object);
 
-        _service = new EmployeeSchedulerService(_schedulerFactoryMock.Object);
+        _service = new EmployeeSchedulerServiceJob(_schedulerFactoryMock.Object);
     }
 
     [Fact]

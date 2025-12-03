@@ -10,18 +10,22 @@ namespace HRSystem.Infrastructure.Configurations
         {
             builder.Property(x => x.PersonalNumber)
                    .IsRequired()
-                   .HasMaxLength(11);
+                   .HasMaxLength(11)
+                   .IsUnicode(false);
 
             builder.Property(x => x.FirstName)
                    .IsRequired()
-                   .HasMaxLength(100);
+                   .HasMaxLength(100)
+                   .IsUnicode(true);
 
             builder.Property(x => x.LastName)
                    .IsRequired()
-                   .HasMaxLength(100);
+                   .HasMaxLength(100)
+                   .IsUnicode(true);
 
             builder.Property(x => x.Email)
-                   .HasMaxLength(150);
+                   .HasMaxLength(150)
+                   .IsUnicode(true);
 
             builder.HasOne(x => x.Position)
                    .WithMany(x => x.Employees)

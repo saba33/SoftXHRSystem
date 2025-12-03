@@ -1,5 +1,4 @@
-﻿using HRSystem.Application.DTOs.Common;
-using Serilog;
+﻿using Serilog;
 using System.Net;
 
 namespace HRSystem.API.MIddlewares
@@ -13,7 +12,7 @@ namespace HRSystem.API.MIddlewares
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {
@@ -25,24 +24,27 @@ namespace HRSystem.API.MIddlewares
 
                 Log.ForContext("ErrorId", errorId)
                    .ForContext("Path", context.Request.Path)
-                   .ForContext("Query", context.Request.QueryString.Value)
+                   .ForContext("Query", context.Request.QueryString.Value ?? "")
                    .ForContext("Method", context.Request.Method)
                    .ForContext("IP", context.Connection.RemoteIpAddress?.ToString())
-                   .Error(ex, "Unhandled exception occurred.");
+                   .Error(ex, "Unhandled exception");
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                var response = new
+                var errorResponse = new
                 {
-                    success = false,
-                    message = "Internal server error occurred.",
-                    errorId = errorId,
-                    path = context.Request.Path,
-                    timestamp = DateTime.UtcNow.ToString("o")
+                    error = new
+                    {
+                        id = errorId,
+                        message = "Internal server error occurred.",
+                        traceId = context.TraceIdentifier,
+                        timestamp = DateTime.UtcNow.ToString("o"),
+                        path = context.Request.Path
+                    }
                 };
 
-                await context.Response.WriteAsJsonAsync(response);
+                await context.Response.WriteAsJsonAsync(errorResponse);
             }
         }
     }

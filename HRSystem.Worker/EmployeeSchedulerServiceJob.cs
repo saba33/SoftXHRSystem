@@ -1,12 +1,13 @@
-﻿using Quartz;
+﻿using HRSystem.Application.Interfaces.Services;
+using Quartz;
 
-namespace HRSystem.API.Services
+namespace HRSystem.Worker
 {
-    public class EmployeeSchedulerService
+    public class EmployeeSchedulerServiceJob : IEmployeeSchedulerService
     {
         private readonly ISchedulerFactory _schedulerFactory;
 
-        public EmployeeSchedulerService(ISchedulerFactory schedulerFactory)
+        public EmployeeSchedulerServiceJob(ISchedulerFactory schedulerFactory)
         {
             _schedulerFactory = schedulerFactory;
         }
@@ -17,14 +18,14 @@ namespace HRSystem.API.Services
 
             var jobKey = new JobKey($"activation-job-{employeeId}");
 
-            var job = JobBuilder.Create<HRSystem.Worker.EmployeeActivationJob>()
+            var job = JobBuilder.Create<EmployeeActivationJob>()
                 .WithIdentity(jobKey)
                 .UsingJobData("EmployeeId", employeeId)
                 .Build();
 
             var trigger = TriggerBuilder.Create()
                 .WithIdentity($"activation-trigger-{employeeId}")
-                .StartAt(DateTimeOffset.UtcNow.AddSeconds(30))
+                .StartAt(DateTimeOffset.UtcNow.AddHours(1))
                 .Build();
 
             await scheduler.ScheduleJob(job, trigger);

@@ -3,9 +3,11 @@ using FluentAssertions;
 using HRSystem.Application.DTOs.Employees.Requests;
 using HRSystem.Application.DTOs.Employees.Responses;
 using HRSystem.Application.Interfaces.Repositories;
+using HRSystem.Application.Interfaces.Services;
 using HRSystem.Application.Services;
 using HRSystem.Domain.Entities;
 using HRSystem.Domain.Enums;
+using Microsoft.Extensions.Logging;
 using Moq;
 namespace HRSystem.Tests.Application
 {
@@ -13,14 +15,19 @@ namespace HRSystem.Tests.Application
     {
         private readonly Mock<IEmployeeRepository> _repoMock;
         private readonly Mock<IMapper> _mapperMock;
+        private readonly Mock<ILogger<EmployeeService>> _loggerMock;
+        private readonly Mock<IEmployeeSchedulerService> _schedulerMock;
         private readonly EmployeeService _service;
 
         public EmployeeServiceTests()
         {
             _repoMock = new Mock<IEmployeeRepository>();
             _mapperMock = new Mock<IMapper>();
-            _service = new EmployeeService(_repoMock.Object, _mapperMock.Object);
+            _loggerMock = new Mock<ILogger<EmployeeService>>();
+            _schedulerMock = new Mock<IEmployeeSchedulerService>();
+            _service = new EmployeeService(_repoMock.Object, _mapperMock.Object, _loggerMock.Object, _schedulerMock.Object);
         }
+
 
         [Fact]
         public async Task CreateAsync_ShouldCreateEmployee_WhenValid()
@@ -46,7 +53,7 @@ namespace HRSystem.Tests.Application
             _mapperMock.Setup(m => m.Map<EmployeeResponse>(employee))
                        .Returns(new EmployeeResponse { Id = 1, FirstName = "salome" });
 
-            var result = await _service.CreateAsync(request);
+            var result = await _service.CreateAsync(request, 1);
 
             result.Should().NotBeNull();
             result.Id.Should().Be(1);

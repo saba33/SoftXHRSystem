@@ -10,7 +10,9 @@ namespace HRSystem.Infrastructure.Configurations
         {
             builder.Property(x => x.Name)
                    .IsRequired()
-                   .HasMaxLength(150);
+                   .HasMaxLength(150)
+                   .IsUnicode(true);
+
 
             builder.HasOne(x => x.Parent)
                    .WithMany(x => x.Children)
